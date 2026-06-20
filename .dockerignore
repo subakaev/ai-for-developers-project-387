@@ -1,0 +1,29 @@
+# Dependencies & build output (reinstalled / rebuilt inside the image)
+node_modules
+**/node_modules
+**/dist
+**/build
+*.tsbuildinfo
+
+# Generated / contract output (apps use the committed schema.d.ts)
+**/tsp-output
+
+# Tests, reports, docs — not needed to build or run the app
+coverage
+**/coverage
+playwright-report
+test-results
+e2e
+docs
+
+# Tooling / VCS / CI
+.git
+.github
+.idea
+.vscode
+
+# Env & logs
+.env
+.env.*
+*.log
+.DS_Store
