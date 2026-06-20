@@ -1,0 +1,39 @@
+{
+  "name": "calls-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cal.com-style call booking service (Hexlet project #386)",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "contract:build": "npm run build --workspace @calls/contract",
+    "mock": "prism mock packages/contract/tsp-output/openapi.yaml -p 4010 --dynamic",
+    "dev": "concurrently -n api,web -c magenta,green \"npm run dev -w @calls/backend\" \"npm run dev -w @calls/frontend\"",
+    "dev:api": "npm run dev -w @calls/backend",
+    "dev:web": "npm run dev -w @calls/frontend",
+    "dev:mock": "concurrently -n mock,web -c blue,green \"npm:mock\" \"VITE_PROXY_TARGET=http://localhost:4010 npm run dev -w @calls/frontend\"",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.49.1",
+    "@stoplight/prism-cli": "^5.15.11",
+    "concurrently": "^10.0.3",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0"
+  }
+}
