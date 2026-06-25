@@ -18,7 +18,12 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 
 import { toApiError, type Booking, type Slot } from '../../api/client';
-import { useCreateBooking, useEventType, useSlots } from '../../api/queries';
+import {
+  useAvailability,
+  useCreateBooking,
+  useEventType,
+  useSlots,
+} from '../../api/queries';
 import { QueryBoundary } from '../../components/QueryBoundary';
 import { SlotPicker } from '../../components/SlotPicker';
 import { formatSlotRange } from '../../lib/format';
@@ -27,7 +32,9 @@ export function BookingPage() {
   const { eventTypeId = '' } = useParams();
   const eventTypeQuery = useEventType(eventTypeId);
   const slotsQuery = useSlots(eventTypeId);
+  const availabilityQuery = useAvailability();
   const createBooking = useCreateBooking(eventTypeId);
+  const scheduleTimeZone = availabilityQuery.data?.timezone;
 
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
@@ -61,7 +68,11 @@ export function BookingPage() {
           notifications.show({
             color: 'green',
             title: 'Booking confirmed',
-            message: formatSlotRange(booking.start, booking.end),
+            message: formatSlotRange(
+              booking.start,
+              booking.end,
+              scheduleTimeZone,
+            ),
           });
         },
         onError: (err) => setFormError(toApiError(err).message),
@@ -96,7 +107,13 @@ export function BookingPage() {
                 <Title order={4} mb="xs">
                   ✅ You're booked!
                 </Title>
-                <Text>{formatSlotRange(confirmed.start, confirmed.end)}</Text>
+                <Text>
+                  {formatSlotRange(
+                    confirmed.start,
+                    confirmed.end,
+                    scheduleTimeZone,
+                  )}
+                </Text>
                 <Text c="dimmed" size="sm">
                   Confirmation sent to {confirmed.guestEmail}.
                 </Text>
@@ -117,6 +134,7 @@ export function BookingPage() {
                   slots={slotsQuery.data ?? []}
                   selectedStart={selectedSlot?.start ?? null}
                   onSelect={handleSelect}
+                  timeZone={scheduleTimeZone}
                 />
               </QueryBoundary>
             )}
@@ -129,7 +147,11 @@ export function BookingPage() {
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack>
               <Alert variant="light">
-                {formatSlotRange(selectedSlot.start, selectedSlot.end)}
+                {formatSlotRange(
+                  selectedSlot.start,
+                  selectedSlot.end,
+                  scheduleTimeZone,
+                )}
               </Alert>
               <TextInput
                 label="Your name"
