@@ -27,8 +27,7 @@ const staticImports: DynamicModule[] = existsSync(frontendDist)
           '/availability/{*splat}',
           '/bookings',
           '/bookings/{*splat}',
-          '/healthz',
-          '/healthz/{*splat}',
+          '/healthz*',
         ],
       }),
     ]
