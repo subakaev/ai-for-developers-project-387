@@ -6,6 +6,7 @@ import { StoreModule } from './store/store.module';
 import { EventTypesModule } from './event-types/event-types.module';
 import { AvailabilityModule } from './availability/availability.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { HealthModule } from './health/health.module';
 
 // In production the built React SPA is served from the same origin as the API
 // (single container, single PORT). We only register the static handler when the
@@ -26,6 +27,7 @@ const staticImports: DynamicModule[] = existsSync(frontendDist)
           '/availability/{*splat}',
           '/bookings',
           '/bookings/{*splat}',
+          '/healthz*',
         ],
       }),
     ]
@@ -38,6 +40,7 @@ const staticImports: DynamicModule[] = existsSync(frontendDist)
     EventTypesModule,
     AvailabilityModule,
     BookingsModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
