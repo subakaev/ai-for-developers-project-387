@@ -27,6 +27,9 @@ test('guest books a slot, it appears for the owner and is no longer offered', as
 
   await expect(page).toHaveURL(/\/book\/intro-call$/);
   await expect(page.getByRole('heading', { name: 'Intro call' })).toBeVisible();
+  await expect(
+    page.getByText(/Select a time\s*\(Europe\/Moscow\)/),
+  ).toBeVisible();
 
   // 2. Pick the first available time slot (the first day is preselected).
   const timeButtons = page.getByRole('button', { name: /^\d{2}:\d{2}$/ });

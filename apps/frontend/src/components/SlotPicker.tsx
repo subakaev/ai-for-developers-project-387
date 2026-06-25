@@ -7,30 +7,32 @@ interface SlotPickerProps {
   slots: Slot[];
   selectedStart: string | null;
   onSelect: (slot: Slot) => void;
+  timeZone?: string;
 }
 
-/** Groups slots by local calendar day and lets the guest pick a free slot. */
+/** Groups slots by display timezone day and lets the guest pick a free slot. */
 export function SlotPicker({
   slots,
   selectedStart,
   onSelect,
+  timeZone,
 }: SlotPickerProps) {
   const days = useMemo(() => {
     const byDay = new Map<string, Slot[]>();
     for (const slot of [...slots].sort((a, b) =>
       a.start.localeCompare(b.start),
     )) {
-      const key = dayKey(slot.start);
+      const key = dayKey(slot.start, timeZone);
       const list = byDay.get(key) ?? [];
       list.push(slot);
       byDay.set(key, list);
     }
     return [...byDay.entries()].map(([key, list]) => ({
       key,
-      label: formatDate(list[0]!.start),
+      label: formatDate(list[0]!.start, timeZone),
       slots: list,
     }));
-  }, [slots]);
+  }, [slots, timeZone]);
 
   const [activeDay, setActiveDay] = useState<string | null>(
     days[0]?.key ?? null,
@@ -68,7 +70,7 @@ export function SlotPicker({
         <Text size="sm" fw={500} mb={6}>
           Select a time{' '}
           <Text span c="dimmed" size="xs">
-            ({localTzLabel})
+            ({timeZone ?? localTzLabel})
           </Text>
         </Text>
         <SimpleGrid cols={{ base: 3, sm: 4, md: 6 }} spacing="xs">
@@ -80,7 +82,7 @@ export function SlotPicker({
               disabled={!slot.available}
               onClick={() => onSelect(slot)}
             >
-              {formatTime(slot.start)}
+              {formatTime(slot.start, timeZone)}
             </Button>
           ))}
         </SimpleGrid>
