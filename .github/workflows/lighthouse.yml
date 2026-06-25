@@ -1,0 +1,56 @@
+name: lighthouse
+
+# Scheduled nightly quality check (the required "regular automatic check").
+# Builds the production app exactly like the Docker image (SPA served by Nest
+# same-origin), starts it, and runs Lighthouse CI against it. The report is
+# uploaded to temporary public storage and written to the run summary.
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 03:00 UTC nightly
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app (same-origin SPA + API, like the Docker image)
+        run: |
+          npm run build -w @calls/frontend
+          npm run build -w @calls/backend
+        env:
+          VITE_API_BASE_URL: ''
+
+      - name: Start server
+        run: |
+          PORT=3000 node apps/backend/dist/main.js &
+          npx wait-on http://localhost:3000/event-types --timeout 60000
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./.lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Write report links to summary
+        if: ${{ !cancelled() }}
+        run: |
+          echo "### Lighthouse nightly report" >> "$GITHUB_STEP_SUMMARY"
+          if [ -d .lighthouseci ]; then
+            for f in .lighthouseci/*.html; do
+              [ -e "$f" ] && echo "- Report artifact: \`$f\`" >> "$GITHUB_STEP_SUMMARY"
+            done
+            grep -ho 'https://storage.googleapis.com[^"]*' .lighthouseci/links.json 2>/dev/null \
+              | sed 's/^/- Public report: /' >> "$GITHUB_STEP_SUMMARY" || true
+          fi
