@@ -10,8 +10,8 @@ function formatInTimeZone(
   iso: string,
   timeZone: string | undefined,
   options: Intl.DateTimeFormatOptions,
-): string {
-  if (!timeZone) return '';
+): string | undefined {
+  if (!timeZone) return undefined;
   return new Intl.DateTimeFormat(DISPLAY_LOCALE, {
     timeZone,
     ...options,
