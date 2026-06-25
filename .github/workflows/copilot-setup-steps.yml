@@ -1,0 +1,36 @@
+name: Copilot Setup Steps
+
+# Prepares the ephemeral environment the GitHub Copilot coding agent runs in:
+# installs workspace dependencies and the Playwright browser so the agent can run
+# the full check suite (lint, unit/e2e tests, Playwright booking scenario).
+#
+# The job MUST be named `copilot-setup-steps` for Copilot to pick it up, and this
+# file must exist on the default branch to take effect.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
