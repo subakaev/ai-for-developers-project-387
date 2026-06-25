@@ -31,6 +31,11 @@ describe('Bookings & event types (e2e)', () => {
 
   const server = () => app.getHttpServer();
 
+  it('returns 200 { status: "ok" } from the health endpoint', async () => {
+    const res = await request(server()).get('/healthz').expect(200);
+    expect(res.body).toEqual({ status: 'ok' });
+  });
+
   it('serves the seeded event types', async () => {
     const res = await request(server()).get('/event-types').expect(200);
     expect(res.body.length).toBeGreaterThanOrEqual(2);

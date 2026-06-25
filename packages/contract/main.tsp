@@ -157,8 +157,23 @@ model BookingCreate {
 }
 
 // ---------------------------------------------------------------------------
+// Health
+// ---------------------------------------------------------------------------
+
+/** Liveness probe response. */
+model HealthStatus {
+  status: "ok";
+}
+
+// ---------------------------------------------------------------------------
 // Routes
 // ---------------------------------------------------------------------------
+
+@route("/healthz")
+namespace Health {
+  /** Liveness probe — returns 200 {"status":"ok"} with no side effects. */
+  @get op check(): HealthStatus;
+}
 
 @route("/event-types")
 namespace EventTypes {
