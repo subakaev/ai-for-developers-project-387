@@ -26,7 +26,7 @@ import {
 } from '../../api/queries';
 import { QueryBoundary } from '../../components/QueryBoundary';
 import { SlotPicker } from '../../components/SlotPicker';
-import { formatSlotRange, localTzLabel } from '../../lib/format';
+import { formatSlotRange } from '../../lib/format';
 
 export function BookingPage() {
   const { eventTypeId = '' } = useParams();
@@ -34,7 +34,7 @@ export function BookingPage() {
   const slotsQuery = useSlots(eventTypeId);
   const availabilityQuery = useAvailability();
   const createBooking = useCreateBooking(eventTypeId);
-  const scheduleTimeZone = availabilityQuery.data?.timezone ?? localTzLabel;
+  const scheduleTimeZone = availabilityQuery.data?.timezone;
 
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
@@ -127,8 +127,8 @@ export function BookingPage() {
               </Card>
             ) : (
               <QueryBoundary
-                isLoading={slotsQuery.isLoading}
-                error={slotsQuery.error}
+                isLoading={slotsQuery.isLoading || availabilityQuery.isLoading}
+                error={slotsQuery.error ?? availabilityQuery.error}
               >
                 <SlotPicker
                   slots={slotsQuery.data ?? []}

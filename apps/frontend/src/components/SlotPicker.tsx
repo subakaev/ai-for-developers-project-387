@@ -10,7 +10,7 @@ interface SlotPickerProps {
   timeZone?: string;
 }
 
-/** Groups slots by local calendar day and lets the guest pick a free slot. */
+/** Groups slots by display timezone day and lets the guest pick a free slot. */
 export function SlotPicker({
   slots,
   selectedStart,

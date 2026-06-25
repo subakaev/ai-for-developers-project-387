@@ -12,10 +12,14 @@ function formatInTimeZone(
   options: Intl.DateTimeFormatOptions,
 ): string | undefined {
   if (!timeZone) return undefined;
-  return new Intl.DateTimeFormat(DISPLAY_LOCALE, {
-    timeZone,
-    ...options,
-  }).format(new Date(iso));
+  try {
+    return new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+      timeZone,
+      ...options,
+    }).format(new Date(iso));
+  } catch {
+    return undefined;
+  }
 }
 
 function datePartsInTimeZone(
@@ -23,12 +27,17 @@ function datePartsInTimeZone(
   timeZone: string | undefined,
 ): { year: string; month: string; day: string } | null {
   if (!timeZone) return null;
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(new Date(iso));
+  let parts: Intl.DateTimeFormatPart[];
+  try {
+    parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(new Date(iso));
+  } catch {
+    return null;
+  }
   const year = parts.find((p) => p.type === 'year')?.value;
   const month = parts.find((p) => p.type === 'month')?.value;
   const day = parts.find((p) => p.type === 'day')?.value;
